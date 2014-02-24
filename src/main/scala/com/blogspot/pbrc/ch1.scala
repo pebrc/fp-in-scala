@@ -16,7 +16,7 @@ object Chapter1 {
 
     def series(i: Int, j: Int): Stream[Int] = i #:: series(j , i + j)
 
-    series(1, 0).take(n).foldLeft(0)(_ + _)
+    series(1, 1).take(n).last
   }
 
   def isSorted[A](as: Array[A], gt: (A, A) => Boolean): Boolean = {
