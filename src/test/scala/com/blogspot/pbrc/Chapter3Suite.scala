@@ -53,5 +53,8 @@ class Chapter3Suite extends FunSuite {
     assert(List(1,2,3,4) === List.append(List(1,2,3),List(4)))
   }
 
+  test("flatten turns a list of lists of a into a list of a") {
+    assert(List(1,2,3,4,5) === List.flatten(List(List(1,2), List(3, 4), List(5))))
+  }
 
 }

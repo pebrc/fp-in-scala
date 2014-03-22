@@ -72,7 +72,9 @@ object List {
   //after reading: https://github.com/pchiusano/fpinscala/blob/master/answerkey/datastructures/13.hint.txt
   def foldRightTailRec[A, B](as: List[A], z: B)(f: (A,B) => B):B = foldLeft(reverse(as), z)((b, a) => f(a,b))
 
-  def append[A](a1: List[A], a2: List[A]):List[A] = foldRight(a1, a2)((a, a2) => Cons(a, a2)) 
+  def append[A](a1: List[A], a2: List[A]):List[A] = foldRight(a1, a2)((a, a2) => Cons(a, a2))
+
+  def flatten[A](as: List[List[A]]):List[A] = foldRight(as, Nil:List[A])((a, acc) => append(a, acc))
  
 }
 
