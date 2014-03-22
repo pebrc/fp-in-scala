@@ -45,4 +45,8 @@ class Chapter3Suite extends FunSuite {
     assert(24.0 === List.product2(List(1,2,3,4)))
   }
 
+  test("reverse returns a new list with the original list's elements in reverse order") {
+    assert(List(3,2,1) == List.reverse(List(1,2,3)))
+  }
+
 }

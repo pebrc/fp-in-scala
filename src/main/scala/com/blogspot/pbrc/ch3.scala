@@ -66,6 +66,8 @@ object List {
   def sum2(ns: List[Int]) = foldLeft(ns, 0)((x,y) => x + y)
 
   def product2(ns: List[Double]) = foldLeft(ns, 1.0)(_ * _)
+
+  def reverse[A](l: List[A]):List[A] = foldLeft(l, Nil:List[A])((b, a) => Cons(a, b))
 }
 
 object Chapter3 {
