@@ -37,4 +37,12 @@ class Chapter3Suite extends FunSuite {
     assert(3 === List.length(List(1,2,3)))
   }
 
+  test("sum calculates the sum of all elements of a list") {
+    assert(6 === List.sum2(List(1,2,3)))
+  }
+
+  test("product calculates the product of all elements of list") {
+    assert(24.0 === List.product2(List(1,2,3,4)))
+  }
+
 }
