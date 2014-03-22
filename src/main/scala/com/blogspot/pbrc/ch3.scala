@@ -68,6 +68,9 @@ object List {
   def product2(ns: List[Double]) = foldLeft(ns, 1.0)(_ * _)
 
   def reverse[A](l: List[A]):List[A] = foldLeft(l, Nil:List[A])((b, a) => Cons(a, b))
+
+  //after reading: https://github.com/pchiusano/fpinscala/blob/master/answerkey/datastructures/13.hint.txt
+  def foldRightTailRec[A, B](as: List[A], z: B)(f: (A,B) => B):B = foldLeft(reverse(as), z)((b, a) => f(a,b)) 
 }
 
 object Chapter3 {
