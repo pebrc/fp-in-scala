@@ -41,18 +41,27 @@ object List {
 
   def dropWhile[A](l: List[A], f: A => Boolean): List[A] = l match {
     case Cons(h, t) if f(h) => dropWhile(t, f)
-    case _ => l  
+    case _ => l
   }
 
-  def init[A](l: List[A]):List[A] = l match {
+  def init[A](l: List[A]): List[A] = l match {
     case Cons(h, Nil) => List()
     case Cons(h, Cons(t, Nil)) => Cons(h, Nil)
-    case Cons(h, t) => Cons(h, init(t))  
+    case Cons(h, t) => Cons(h, init(t))
   }
+
+  def foldRight[A, B](as: List[A], z: B)(f: (A, B) => B): B = as match {
+    case Nil => z
+    case Cons(x, xs) => f(x, foldRight(xs, z)(f))
+  }
+
+  def length[A](l: List[A]): Int = foldRight(l, 0)((a, b) => b + 1)
 
 }
 
 object Chapter3 {
+
+  import com.blogspot.pbrc.List._
 
   val x = List(1, 2, 3, 4, 5) match {
     case Cons(x, Cons(2, Cons(4, _))) => x
@@ -62,4 +71,5 @@ object Chapter3 {
     case _ => 101
   }
 
+  val y = foldRight(List(1, 2, 3), Nil: List[Int])(Cons(_, _))
 }

@@ -33,4 +33,8 @@ class Chapter3Suite extends FunSuite {
     assert(List(1,2) == List.init(List(1,2,3)))
   }
 
+  test("length calculates the length of a given list") {
+    assert(3 === List.length(List(1,2,3)))
+  }
+
 }
