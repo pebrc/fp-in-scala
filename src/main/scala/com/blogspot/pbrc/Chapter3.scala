@@ -58,24 +58,30 @@ object List {
   def length[A](l: List[A]): Int = foldRight(l, 0)((a, b) => b + 1)
 
   @annotation.tailrec
-  def foldLeft[A,B](l: List[A], z: B)(f:(B,A) => B):B = l match {
+  def foldLeft[A, B](l: List[A], z: B)(f: (B, A) => B): B = l match {
     case Nil => z
     case Cons(x, xs) => foldLeft(xs, f(z, x))(f)
   }
 
-  def sum2(ns: List[Int]) = foldLeft(ns, 0)((x,y) => x + y)
+  def sum2(ns: List[Int]) = foldLeft(ns, 0)((x, y) => x + y)
 
   def product2(ns: List[Double]) = foldLeft(ns, 1.0)(_ * _)
 
-  def reverse[A](l: List[A]):List[A] = foldLeft(l, Nil:List[A])((b, a) => Cons(a, b))
+  def reverse[A](l: List[A]): List[A] = foldLeft(l, Nil: List[A])((b, a) => Cons(a, b))
 
   //after reading: https://github.com/pchiusano/fpinscala/blob/master/answerkey/datastructures/13.hint.txt
-  def foldRightTailRec[A, B](as: List[A], z: B)(f: (A,B) => B):B = foldLeft(reverse(as), z)((b, a) => f(a,b))
+  def foldRightTailRec[A, B](as: List[A], z: B)(f: (A, B) => B): B = foldLeft(reverse(as), z)((b, a) => f(a, b))
 
-  def append[A](a1: List[A], a2: List[A]):List[A] = foldRight(a1, a2)((a, a2) => Cons(a, a2))
+  def append[A](a1: List[A], a2: List[A]): List[A] = foldRight(a1, a2)((a, a2) => Cons(a, a2))
 
-  def flatten[A](as: List[List[A]]):List[A] = foldRight(as, Nil:List[A])((a, acc) => append(a, acc))
- 
+  def flatten[A](as: List[List[A]]): List[A] = foldRight(as, Nil: List[A])((a, acc) => append(a, acc))
+
+  def map[A, B](l: List[A])(f: A => B): List[B] = foldRightTailRec(l, Nil: List[B])((a, bs) => Cons(f(a), bs))
+
+  def plusOne(ns: List[Int]) = map(ns)(_ + 1)
+
+  def doubleToStr(ds: List[Double]) = map(ds)(_.toString)
+
 }
 
 object Chapter3 {
