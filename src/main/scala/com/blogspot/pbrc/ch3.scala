@@ -70,7 +70,10 @@ object List {
   def reverse[A](l: List[A]):List[A] = foldLeft(l, Nil:List[A])((b, a) => Cons(a, b))
 
   //after reading: https://github.com/pchiusano/fpinscala/blob/master/answerkey/datastructures/13.hint.txt
-  def foldRightTailRec[A, B](as: List[A], z: B)(f: (A,B) => B):B = foldLeft(reverse(as), z)((b, a) => f(a,b)) 
+  def foldRightTailRec[A, B](as: List[A], z: B)(f: (A,B) => B):B = foldLeft(reverse(as), z)((b, a) => f(a,b))
+
+  def append[A](a1: List[A], a2: List[A]):List[A] = foldRight(a1, a2)((a, a2) => Cons(a, a2)) 
+ 
 }
 
 object Chapter3 {

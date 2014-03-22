@@ -46,7 +46,12 @@ class Chapter3Suite extends FunSuite {
   }
 
   test("reverse returns a new list with the original list's elements in reverse order") {
-    assert(List(3,2,1) == List.reverse(List(1,2,3)))
+    assert(List(3,2,1) === List.reverse(List(1,2,3)))
   }
+
+  test("append concatenates two lists") {
+    assert(List(1,2,3,4) === List.append(List(1,2,3),List(4)))
+  }
+
 
 }
