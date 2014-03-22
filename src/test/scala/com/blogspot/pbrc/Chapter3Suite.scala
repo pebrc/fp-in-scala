@@ -76,4 +76,9 @@ class Chapter3Suite extends FunSuite {
   test("filter via flatMap") {
     assert(List(2, 4, 6) === List.filterViaFlatMap(List(1, 2, 3, 4, 5, 6))(_ % 2 == 0))
   }
+
+  test("add corresponing elements") {
+    assert(List(5, 7, 9) === List.zip(List(1, 2, 3), List(4, 5, 6))(_ + _))
+
+  }
 }

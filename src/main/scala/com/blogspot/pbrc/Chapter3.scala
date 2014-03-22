@@ -87,6 +87,13 @@ object List {
   def flatMap[A, B](l: List[A])(f: A => List[B]): List[B] = flatten(map(l)(f))
 
   def filterViaFlatMap[A](l: List[A])(f: A => Boolean): List[A] = flatMap(l)(i => if (f(i)) List(i) else List())
+
+  def zip[A, B](l1: List[A], l2: List[B])(f: (A, B) => A): List[A] = (l1, l2) match {
+    case (Nil, _) => Nil
+    case (_, Nil) => Nil
+    case (Cons(h1, t1), Cons(h2, t2)) => Cons(f(h1, h2), zip(t1, t2)(f))
+  }
+
 }
 
 object Chapter3 {
