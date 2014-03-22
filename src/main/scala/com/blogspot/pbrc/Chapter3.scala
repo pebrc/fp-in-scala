@@ -82,6 +82,8 @@ object List {
 
   def doubleToStr(ds: List[Double]) = map(ds)(_.toString)
 
+  def filter[A](l: List[A])(f: A => Boolean): List[A] = foldRightTailRec(l, Nil: List[A])((a, acc) => if (f(a)) Cons(a, acc) else acc)
+
 }
 
 object Chapter3 {

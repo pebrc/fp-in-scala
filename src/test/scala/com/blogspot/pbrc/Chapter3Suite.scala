@@ -65,4 +65,7 @@ class Chapter3Suite extends FunSuite {
     assert(List("1.0", "2.0", "3.0") === List.doubleToStr(List(1, 2, 3)))
   }
 
+  test("filter odd numbers from a list") {
+    assert(List(2, 4, 6) === List.filter(List(1, 2, 3, 4, 5, 6))(_ % 2 == 0))
+  }
 }
