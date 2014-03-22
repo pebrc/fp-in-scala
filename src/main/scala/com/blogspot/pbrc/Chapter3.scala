@@ -85,6 +85,8 @@ object List {
   def filter[A](l: List[A])(f: A => Boolean): List[A] = foldRightTailRec(l, Nil: List[A])((a, acc) => if (f(a)) Cons(a, acc) else acc)
 
   def flatMap[A, B](l: List[A])(f: A => List[B]): List[B] = flatten(map(l)(f))
+
+  def filterViaFlatMap[A](l: List[A])(f: A => Boolean): List[A] = flatMap(l)(i => if (f(i)) List(i) else List())
 }
 
 object Chapter3 {

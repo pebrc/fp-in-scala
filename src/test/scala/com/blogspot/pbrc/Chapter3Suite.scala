@@ -72,4 +72,8 @@ class Chapter3Suite extends FunSuite {
   test("flatMap flattens after mapping") {
     assert(List(1, 1, 2, 2, 3, 3) == List.flatMap(List(1, 2, 3))(i => List(i, i)))
   }
+
+  test("filter via flatMap") {
+    assert(List(2, 4, 6) === List.filterViaFlatMap(List(1, 2, 3, 4, 5, 6))(_ % 2 == 0))
+  }
 }
