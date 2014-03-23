@@ -89,4 +89,9 @@ class Chapter3Suite extends FunSuite {
   test("hasSubsequence returns false when the other list is not a sublist") {
     assert(!hasSubsequence(List(1, 2, 3, 4, 5), List(6, 7, 8)));
   }
+
+  import com.blogspot.pbrc.Tree._
+  test("size calculates the number of nodes in a tree") {
+    assert(3 === size(Branch(Leaf(1), Leaf(2))))
+  }
 }
