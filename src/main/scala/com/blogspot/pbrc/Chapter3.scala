@@ -128,9 +128,27 @@ object Tree {
   }
 
   def depth[A](t: Tree[A]): Int = t match {
-    case Leaf(_) => 1
+    case Leaf(_) => 0
     case Branch(left, right) => 1 + depth(left) max depth(right)
   }
+
+  def map[A, B](t: Tree[A])(f: A => B): Tree[B] = t match {
+    case Leaf(v) => Leaf(f(v))
+    case Branch(left, right) => Branch(map(left)(f), map(right)(f))
+  }
+
+  def fold[A, B](t: Tree[A])(f: A => B)(g: (B, B) => B): B = t match {
+    case Leaf(v) => f(v)
+    case Branch(l, r) => g(fold(l)(f)(g), fold(r)(f)(g))
+  }
+
+  def foldedSize[A](t: Tree[A]): Int = fold(t)(a => 1)(_ + _ + 1)
+
+  def foldedMaximum(t: Tree[Int]): Int = fold(t)(identity)(_ max _)
+
+  def foldedDepth[A](t: Tree[A]): Int = fold(t)(a => 0)((l, r) => 1 + (l max r))
+
+  def foldedMap[A, B](t: Tree[A])(f: A => B): Tree[B] = fold(t)(a => Leaf(f(a)): Tree[B])(Branch(_, _))
 }
 object Chapter3 {
 

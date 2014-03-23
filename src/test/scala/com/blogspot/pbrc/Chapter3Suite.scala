@@ -99,7 +99,19 @@ class Chapter3Suite extends FunSuite {
     assert(3 === maximum(Branch(Leaf(1), Branch(Leaf(2), Leaf(3)))))
   }
 
-  test("depth of a tree of 1,2,3 is 2") {
-    assert(2 === depth(Branch(Leaf(1), Branch(Leaf(2), Leaf(3)))))
+  test("depth of a tree of 1,2 is 1") {
+    assert(1 === depth(Branch(Leaf(1), Leaf(2))))
   }
+
+  test("folded size calculates the number of nodes in a tree via fold") {
+    assert(3 === foldedSize(Branch(Leaf(1), Leaf(2))))
+  }
+
+  test("folded maximum of a tree of 1, 2, 3 is 3 calculated via fold") {
+    assert(3 === foldedMaximum(Branch(Leaf(1), Branch(Leaf(2), Leaf(3)))))
+  }
+  test("folded depth of a tree of 1,2,3 is 2 calculated via fold") {
+    assert(2 === foldedDepth(Branch(Leaf(1), Branch(Leaf(2), Leaf(3)))))
+  }
+
 }
