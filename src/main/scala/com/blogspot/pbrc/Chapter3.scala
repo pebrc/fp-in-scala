@@ -94,6 +94,21 @@ object List {
     case (Cons(h1, t1), Cons(h2, t2)) => Cons(f(h1, h2), zip(t1, t2)(f))
   }
 
+  def hasSubsequence[A](l: List[A], sub: List[A]): Boolean = {
+    def hasCommonPrefix[A](l: List[A], other: List[A]): Boolean = (l, other) match {
+      case (Nil, _) => false
+      case (_, Nil) => true
+      case (Cons(h1, t1), Cons(h2, t2)) if h1 == h2 => hasCommonPrefix(t1, t2)
+      case _ => false
+    }
+    l match {
+      case Nil => false
+      case Cons(h, t) if hasCommonPrefix(l, sub) => true
+      case Cons(h, t) => hasSubsequence(t, sub)
+    }
+
+  }
+
 }
 
 object Chapter3 {

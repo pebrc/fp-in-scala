@@ -1,6 +1,7 @@
 package com.blogspot.pbrc
 
-import com.blogspot.pbrc.Chapter1._
+import com.blogspot.pbrc.Chapter3._
+import com.blogspot.pbrc.List._
 import org.scalatest.FunSuite
 
 class Chapter3Suite extends FunSuite {
@@ -79,6 +80,13 @@ class Chapter3Suite extends FunSuite {
 
   test("add corresponing elements") {
     assert(List(5, 7, 9) === List.zip(List(1, 2, 3), List(4, 5, 6))(_ + _))
+  }
 
+  test("hasSubsequence returns true when list contains another") {
+    assert(hasSubsequence(List(1, 2, 3, 4, 5), List(2, 3, 4)))
+  }
+
+  test("hasSubsequence returns false when the other list is not a sublist") {
+    assert(!hasSubsequence(List(1, 2, 3, 4, 5), List(6, 7, 8)));
   }
 }
