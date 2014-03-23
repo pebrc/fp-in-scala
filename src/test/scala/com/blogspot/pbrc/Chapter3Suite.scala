@@ -98,4 +98,8 @@ class Chapter3Suite extends FunSuite {
   test("maximum of a tree of 1, 2, 3 is 3") {
     assert(3 === maximum(Branch(Leaf(1), Branch(Leaf(2), Leaf(3)))))
   }
+
+  test("depth of a tree of 1,2,3 is 2") {
+    assert(2 === depth(Branch(Leaf(1), Branch(Leaf(2), Leaf(3)))))
+  }
 }
