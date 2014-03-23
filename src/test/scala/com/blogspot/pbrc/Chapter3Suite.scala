@@ -94,4 +94,8 @@ class Chapter3Suite extends FunSuite {
   test("size calculates the number of nodes in a tree") {
     assert(3 === size(Branch(Leaf(1), Leaf(2))))
   }
+
+  test("maximum of a tree of 1, 2, 3 is 3") {
+    assert(3 === maximum(Branch(Leaf(1), Branch(Leaf(2), Leaf(3)))))
+  }
 }
