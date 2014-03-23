@@ -53,7 +53,13 @@ sealed trait Either[+E, +A] {
 
   //from: https://github.com/pchiusano/fpinscala/blob/master/answerkey/errorhandling/6.answer.scala
   def map2[EE >: E, B, C](b: Either[EE, B])(f: (A, B) => C): Either[EE, C] = for { a <- this; b1 <- b } yield f(a, b1)
+
+  def traverse[E, A, B](as: List[A])(f: A => Either[E, B]): Either[E, List[B]] = as.foldRight(Right(List()): Either[E, List[B]])((a, z) => f(a).map2(z)(_ :: _))
+
+  def sequence[E, A](es: List[Either[E, A]]): Either[E, List[A]] = traverse(es)(identity)
+
 }
+
 case class Left[+E](value: E) extends Either[E, Nothing]
 case class Right[+A](value: A) extends Either[Nothing, A]
 object Chapter4 {
