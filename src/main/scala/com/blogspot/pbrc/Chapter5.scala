@@ -67,6 +67,12 @@ object Stream {
     series(0, 1)
   }
 
+  def unfold[A, S](z: S)(f: S => Option[(A, S)]): Stream[A] =
+    f(z) match {
+      case Some((v, s)) => Stream.cons(v, unfold(s)(f))
+      case _ => Empty
+    }
+
   def constant[A](a: A): Stream[A] = Stream.cons(a, constant(a))
 
   def apply[A](as: A*): Stream[A] =
