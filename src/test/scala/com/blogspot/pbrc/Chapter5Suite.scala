@@ -98,5 +98,8 @@ class Chapter5Suite extends FunSuite {
     assert(List(List(1, 2, 3), List(2, 3), List(3), List()) === Stream(1, 2, 3).tails.map(_.toList).toList)
   }
 
+  test("scanRight is like foldRight with intermediate results") {
+    assert(List(6, 5, 3, 0) === Stream(1, 2, 3).scanRight(0)(_ + _).toList)
+  }
 }
 

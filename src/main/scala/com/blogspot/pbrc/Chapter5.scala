@@ -94,6 +94,13 @@ sealed trait Stream[+A] {
     case _ => None
   }.append(Stream(Stream()))
 
+  //had a peek at the solution by accident...
+  def scanRight[B](z: B)(f: (A, => B) => B): Stream[B] =
+    foldRight((z, Stream(z)))((h, acc) => {
+      val nextVal = f(h, acc._1)
+      (nextVal, Stream.cons(nextVal, acc._2))
+    })._2
+
 }
 case object Empty extends Stream[Nothing]
 case class Cons[+A](h: () => A, t: () => Stream[A]) extends Stream[A]
