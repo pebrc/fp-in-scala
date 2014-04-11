@@ -63,5 +63,25 @@ class Chapter5Suite extends FunSuite {
     assert(List(1, 1, 1, 1) === Stream.constantUnfolded(1).take(4).toList)
   }
 
+  test("mapUnfolded has the same behaviour as map") {
+    assert(List(2, 4, 6) === Stream(1, 2, 3).mapUnfolded(_ * 2).toList)
+  }
+
+  test("takeUnfolded has the same behaviour as take") {
+    assert(List(1, 2, 3, 4, 5, 6, 7, 8, 9, 10) === Stream(1 to 20: _*).takeUnfolded(10).toList)
+  }
+
+  test("zip combines two streams to a stream of tuples") {
+    assert(List((1, 1), (2, 2), (3, 3)) === Stream(1, 2, 3).zip(Stream(1, 2, 3)).toList)
+  }
+
+  test("zipWith combines two streams using a given function") {
+    assert(List(1, 4, 9) === Stream(1, 2, 3).zipWith(Stream(1, 2, 3))(_ * _).toList)
+  }
+
+  test("zipAll continues the traversal as long as either stream has more elements") {
+    assert(List((Some(1), Some(1)), (Some(2), None)) == Stream(1, 2).zipAll(Stream(1)).toList)
+  }
+
 }
 

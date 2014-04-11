@@ -46,6 +46,38 @@ sealed trait Stream[+A] {
   def flatMap[B](f: A => Stream[B]): Stream[B] =
     foldRight(Empty: Stream[B])((h, t) => f(h).append(t))
 
+  def mapUnfolded[B](f: A => B): Stream[B] =
+    Stream.unfold(this) {
+      case Cons(h, t) => Some((f(h()), t()))
+      case _ => None
+    }
+
+  def takeUnfolded(n: Int): Stream[A] =
+    Stream.unfold((this, n)) {
+      case (Cons(h, t), n) if n != 0 => Some((h(), (t(), n - 1)))
+      case _ => None
+    }
+
+  def zip[B](other: Stream[B]): Stream[(A, B)] =
+    Stream.unfold(this, other) {
+      case (Cons(h, t), Cons(h2, t2)) => Some((h(), h2()), (t(), t2()))
+      case _ => None
+    }
+
+  def zipWith[B, C](other: Stream[B])(f: (A, B) => C): Stream[C] =
+    Stream.unfold((this, other)) {
+      case (Cons(h, t), Cons(h2, t2)) => Some((f(h(), h2()), (t(), t2())))
+      case _ => None
+    }
+
+  def zipAll[B](other: Stream[B]): Stream[(Option[A], Option[B])] =
+    Stream.unfold((this, other)) {
+      case (Empty, Cons(h, t)) => Some(((None, Some(h())), (Empty, t())))
+      case (Cons(h, t), Empty) => Some(((Some(h()), None), (t(), Empty)))
+      case (Cons(h, t), Cons(h2, t2)) => Some(((Some(h()), Some(h2())), (t(), t2())))
+      case _ => None
+    }
+
 }
 case object Empty extends Stream[Nothing]
 case class Cons[+A](h: () => A, t: () => Stream[A]) extends Stream[A]
@@ -85,4 +117,5 @@ object Stream {
   def constantUnfolded[A](a: A): Stream[A] = unfold(a)(s => Some((s, s)))
 
   def onesUnfolded: Stream[Int] = constantUnfolded(1)
+
 }
