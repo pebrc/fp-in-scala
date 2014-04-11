@@ -83,5 +83,16 @@ class Chapter5Suite extends FunSuite {
     assert(List((Some(1), Some(1)), (Some(2), None)) == Stream(1, 2).zipAll(Stream(1)).toList)
   }
 
+  test("startsWith checks if a stream is the prefix of another") {
+    assert(Stream(1, 2, 3).startsWith(Stream(1, 2)))
+    assert(Stream(1, 2, 3).startsWith2(Stream(1, 2)))
+  }
+
+  test("if the prefix stream is longer than the other it is not a prefix") {
+    assert(false == Stream(1, 2).startsWith(Stream(1, 2, 3)))
+    assert(false == Stream(1, 2).startsWith2(Stream(1, 2, 3)))
+
+  }
+
 }
 

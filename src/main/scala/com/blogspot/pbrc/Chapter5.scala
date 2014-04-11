@@ -78,6 +78,17 @@ sealed trait Stream[+A] {
       case _ => None
     }
 
+  def startsWith[A](s: Stream[A]): Boolean = zipWith(s)(_ == _)
+    .filter(identity).toList.size == s.toList.size
+
+  //as found in the solution repo
+  def startsWith2[A](s: Stream[A]): Boolean = zipAll(s)
+    .takeWhile(_._2.isDefined)
+    .forAll {
+      case (Some(v), Some(v2)) if v == v2 => true
+      case _ => false;
+    }
+
 }
 case object Empty extends Stream[Nothing]
 case class Cons[+A](h: () => A, t: () => Stream[A]) extends Stream[A]
