@@ -39,5 +39,9 @@ class Chapter5Suite extends FunSuite {
     assert(List(12, 14) === Stream(1, 2, 3, 4).map(_ + 10).filter(_ % 2 == 0).toList)
   }
 
+  test("constant returns the same value ad infinitum") {
+    assert(List(1, 1, 1, 1) === Stream.constant(1).take(4).toList)
+  }
+
 }
 
