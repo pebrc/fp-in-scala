@@ -17,5 +17,18 @@ class Chapter5Suite extends FunSuite {
 
   }
 
+  test("Dropping removes n elements from the front") {
+    assert(List(2, 3) == Stream(1, 2, 3).drop(1).toList)
+  }
+
+  test("takeWhile returns the longest prefix of a stream that satisfies the predicate") {
+    assert(List(1, 2, 3) === Stream(1 to 100: _*).takeWhile(_ < 4).toList)
+  }
+
+  test("forAll tests whether a predicate holds for all elements of this stream") {
+    assert(false === Stream(1 to 100: _*).forAll(_ % 2 == 0))
+    assert(true === Stream(1 until 100: _*).forAll(_ < 100))
+  }
+
 }
 
