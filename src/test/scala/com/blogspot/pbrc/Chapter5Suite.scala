@@ -30,5 +30,10 @@ class Chapter5Suite extends FunSuite {
     assert(true === Stream(1 until 100: _*).forAll(_ < 100))
   }
 
+  test("headOption returns the first element of the stream if nonempty, else None") {
+    assert(Some(1) == Stream(1, 2, 3).headOption)
+    assert(None === Empty.headOption)
+  }
+
 }
 
