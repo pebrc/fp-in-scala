@@ -60,6 +60,8 @@ object Stream {
 
   def empty[A]: Stream[A] = Empty
 
+  def from(n: Int): Stream[Int] = Stream.cons(n, from(n + 1))
+
   def constant[A](a: A): Stream[A] = Stream.cons(a, constant(a))
 
   def apply[A](as: A*): Stream[A] =

@@ -43,5 +43,9 @@ class Chapter5Suite extends FunSuite {
     assert(List(1, 1, 1, 1) === Stream.constant(1).take(4).toList)
   }
 
+  test("from generates an infinite stream of integers starting from n") {
+    assert(List(1, 2, 3, 4) === Stream.from(1).take(4).toList)
+  }
+
 }
 
