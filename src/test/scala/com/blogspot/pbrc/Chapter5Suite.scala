@@ -94,5 +94,9 @@ class Chapter5Suite extends FunSuite {
 
   }
 
+  test("tails returns a stream of suffixes") {
+    assert(List(List(1, 2, 3), List(2, 3), List(3), List()) === Stream(1, 2, 3).tails.map(_.toList).toList)
+  }
+
 }
 

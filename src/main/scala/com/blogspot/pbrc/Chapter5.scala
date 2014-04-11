@@ -89,6 +89,11 @@ sealed trait Stream[+A] {
       case _ => false;
     }
 
+  def tails: Stream[Stream[A]] = Stream.unfold(this) {
+    case c @ Cons(_, t) => Some((c, t()))
+    case _ => None
+  }.append(Stream(Stream()))
+
 }
 case object Empty extends Stream[Nothing]
 case class Cons[+A](h: () => A, t: () => Stream[A]) extends Stream[A]
