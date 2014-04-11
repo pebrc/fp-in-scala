@@ -78,4 +78,11 @@ object Stream {
   def apply[A](as: A*): Stream[A] =
     if (as.isEmpty) empty else cons(as.head, apply(as.tail: _*))
 
+  def fibsUnfolded: Stream[Int] = unfold((1, 0))(t => Some((t._2, (t._2, t._2 + t._1))))
+
+  def fromUnfolded(n: Int): Stream[Int] = unfold(n)(s => Some((s, s + 1)))
+
+  def constantUnfolded[A](a: A): Stream[A] = unfold(a)(s => Some((s, s)))
+
+  def onesUnfolded: Stream[Int] = constantUnfolded(1)
 }

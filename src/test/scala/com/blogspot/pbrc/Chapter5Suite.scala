@@ -51,5 +51,17 @@ class Chapter5Suite extends FunSuite {
     assert(List(0, 1, 1, 2, 3, 5) === Stream.fibs.take(6).toList)
   }
 
+  test("fibsUnfolded has the same behaviour as fibs") {
+    assert(List(0, 1, 1, 2, 3, 5) === Stream.fibsUnfolded.take(6).toList)
+  }
+
+  test("fromUnfolded has the same behaviour as from") {
+    assert(List(1, 2, 3, 4) === Stream.fromUnfolded(1).take(4).toList)
+  }
+
+  test("constantUnfolded has the same behaviour as constant") {
+    assert(List(1, 1, 1, 1) === Stream.constantUnfolded(1).take(4).toList)
+  }
+
 }
 
