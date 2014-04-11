@@ -47,5 +47,9 @@ class Chapter5Suite extends FunSuite {
     assert(List(1, 2, 3, 4) === Stream.from(1).take(4).toList)
   }
 
+  test("fibs generates an infinite stream of Fibonacci numbers") {
+    assert(List(0, 1, 1, 2, 3, 5) === Stream.fibs.take(6).toList)
+  }
+
 }
 
