@@ -35,5 +35,9 @@ class Chapter5Suite extends FunSuite {
     assert(None === Empty.headOption)
   }
 
+  test("map and filter: add 10 and filter for even numbers") {
+    assert(List(12, 14) === Stream(1, 2, 3, 4).map(_ + 10).filter(_ % 2 == 0).toList)
+  }
+
 }
 
