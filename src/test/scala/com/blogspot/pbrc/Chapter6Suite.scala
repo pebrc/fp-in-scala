@@ -28,9 +28,7 @@ class Chapter6Suite extends FunSuite {
 
   test("Can generate n random ints via sequence") {
     val is = intsViaSequence(30)(new Simple(42))
-    println(is._1)
     is._1.size should be(30)
-
   }
 
 }

@@ -100,4 +100,22 @@ object Chapter6 {
   def intsViaSequence(count: Int)(rng: RNG) =
     sequence(List.fill(count)(int))(rng)
 
+  def flatMap[A, B](f: Rand[A])(g: A => Rand[B]): Rand[B] = rng => {
+    val (a, r) = f(rng)
+    g(a)(r)
+  }
+
+  def nonNegativeLessThan(n: Int): Rand[Int] =
+    flatMap(nonNegativeInt)(i => rng => {
+      val mod = i % n
+      if (i + (n - 1) - mod > 0) (mod, rng) else nonNegativeLessThan(n)(rng)
+
+    })
+
+  def mapViaFlatMap[A, B](s: Rand[A])(f: A => B): Rand[B] =
+    flatMap(s)(a => rng => (f(a), rng))
+
+  def map2ViaFlatMap[A, B, C](ra: Rand[A], rb: Rand[B])(f: (A, B) => C): Rand[C] =
+    flatMap(ra)(a => flatMap(rb)(b => rng => (f(a, b), rng)))
 }
+
