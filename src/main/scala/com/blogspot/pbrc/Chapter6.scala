@@ -22,7 +22,7 @@ object Chapter6 {
 
   def double(rng: RNG): (Double, RNG) = {
     val (i, r) = nonNegativeInt(rng)
-    (i / Int.MaxValue, r)
+    (i / (Int.MaxValue.toDouble + 1), r)
   }
 
   def intDouble(rng: RNG): ((Int, Double), RNG) = {
