@@ -41,9 +41,31 @@ object Par {
       def call = a(es).get
     })
 
-  def lazyUnit[A] (a: => A): Par[A] = fork(unit(a))
+  def lazyUnit[A](a: => A): Par[A] = fork(unit(a))
 
-  def asyncF[A,B](f: A => B): A => Par[B] = a => lazyUnit(f(a))
+  def asyncF[A, B](f: A => B): A => Par[B] = a => lazyUnit(f(a))
+
+  def sortPar(parList: Par[List[Int]]): Par[List[Int]] =
+    map2(parList, unit(()))((a, _) => a.sorted)
+
+  def map[A, B](pa: Par[A])(f: A => B): Par[B] =
+    map2(pa, unit(()))((a, _) => f(a))
+
+  def sequence[A](l: List[Par[A]]): Par[List[A]] = {
+    l.foldRight(unit(List.empty: List[A]))((pcur, pacc) => { map2(pcur, pacc)(_ :: _) })
+  }
+
+  def parFilter[A](l: List[A])(f: A => Boolean): Par[List[A]] = fork {
+    val ps: List[Par[A]] = l.map(lazyUnit(_))
+    ps.foldRight(unit(List.empty[A]))((pcur, pfiltered) => {
+      map2(pcur, pfiltered)((cur, filtered) => {
+        if (f(cur)) cur :: filtered
+        else filtered
+      }
+      )
+    })
+
+  }
 
   case class Map2Future[A, B, C](af: Future[A], bf: Future[B], f: (A, B) => C) extends Future[C] {
 
