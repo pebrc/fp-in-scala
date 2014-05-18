@@ -64,7 +64,14 @@ object Par {
       }
       )
     })
+  }
 
+  //as in reference solution
+  def parFilter2[A](l: List[A])(f: A => Boolean): Par[List[A]] = {
+    val ps = l.map(asyncF(a => {
+      if (f(a)) List(a) else List()
+    }))
+    map(sequence(ps))(_.flatten)
   }
 
   case class Map2Future[A, B, C](af: Future[A], bf: Future[B], f: (A, B) => C) extends Future[C] {
