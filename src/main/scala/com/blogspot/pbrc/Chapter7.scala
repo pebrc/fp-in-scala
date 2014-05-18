@@ -74,6 +74,18 @@ object Par {
     map(sequence(ps))(_.flatten)
   }
 
+  def choiceN[A](n: Par[Int])(choices: List[Par[A]]): Par[A] = {
+    es =>
+      {
+        val index = n(es).get()
+        choices(index)(es)
+      }
+  }
+
+  def choice[A](cond: Par[Boolean])(t: Par[A], f: Par[A]): Par[A] = {
+    choiceN(map(cond)(b => if (b) 0 else 1))(List(t, f))
+  }
+
   case class Map2Future[A, B, C](af: Future[A], bf: Future[B], f: (A, B) => C) extends Future[C] {
 
     var cache: Option[C] = None
