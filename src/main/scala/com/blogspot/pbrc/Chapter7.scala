@@ -86,6 +86,21 @@ object Par {
     choiceN(map(cond)(b => if (b) 0 else 1))(List(t, f))
   }
 
+  def chooser[A, B](pa: Par[A])(choices: A => Par[B]): Par[B] = {
+    es =>
+      {
+        choices(pa(es).get)(es)
+      }
+  }
+
+  def chooseN[A](n: Par[Int])(choices: List[Par[A]]): Par[A] = {
+    chooser(n)(choices)
+  }
+
+  def choose[A](cond: Par[Boolean])(t: Par[A], f: Par[A]): Par[A] = {
+    chooser(cond)(b => { if (b) t else f })
+  }
+
   case class Map2Future[A, B, C](af: Future[A], bf: Future[B], f: (A, B) => C) extends Future[C] {
 
     var cache: Option[C] = None
