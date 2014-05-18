@@ -101,6 +101,21 @@ object Par {
     chooser(cond)(b => { if (b) t else f })
   }
 
+  def join[A](a: Par[Par[A]]): Par[A] = {
+    es =>
+      {
+        a(es).get()(es)
+      }
+  }
+
+  def flatMap[A, B](pa: Par[A])(choices: A => Par[B]): Par[B] = {
+    join(map(pa)(choices))
+  }
+
+  def joinViaFlatMap[A](a: Par[Par[A]]): Par[A] = {
+    flatMap(a)(nil => nil)
+  }
+
   case class Map2Future[A, B, C](af: Future[A], bf: Future[B], f: (A, B) => C) extends Future[C] {
 
     var cache: Option[C] = None
