@@ -1,6 +1,6 @@
-package com.blogspot.pbrc
+package fpinscala.fp
 
-import com.blogspot.pbrc.Chapter1._
+import Chapter1._
 import org.scalatest.FunSuite
 
 class Chapter1Suite extends FunSuite {
@@ -28,8 +28,8 @@ class Chapter1Suite extends FunSuite {
   }
 
   test("Being sorted means beeing monotonic") {
-    assert(true == isSorted(Array(1, 2, 3, 4), (x: Int, y: Int) => x < y))
-    assert(false == isSorted(Array(1, 2, 3, 4, 3), (x: Int, y: Int) => x < y))
+    assert(true === isSorted(Array(1, 2, 3, 4), (x: Int, y: Int) => x < y))
+    assert(false === isSorted(Array(1, 2, 3, 4, 3), (x: Int, y: Int) => x < y))
   }
 
   test("Currying narrows the argument list") {

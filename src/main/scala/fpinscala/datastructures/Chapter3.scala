@@ -1,4 +1,4 @@
-package com.blogspot.pbrc
+package fpinscala.datastructures
 
 sealed trait List[+A]
 case object Nil extends List[Nothing]
@@ -152,7 +152,7 @@ object Tree {
 }
 object Chapter3 {
 
-  import com.blogspot.pbrc.List._
+  import fpinscala.datastructures.List._
 
   val x = List(1, 2, 3, 4, 5) match {
     case Cons(x, Cons(2, Cons(4, _))) => x

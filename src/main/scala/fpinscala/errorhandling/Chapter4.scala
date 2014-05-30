@@ -1,5 +1,19 @@
 package fpinscala.errorhandling
 
+object Option {
+  def map2[A, B, C](a: Option[A], b: Option[B])(f: (A, B) => C): Option[C] = (a, b) match {
+    case (_, None) => None
+    case (None, _) => None
+    case (Some(a), Some(b)) => Some(f(a, b))
+  }
+
+  def sequence[A](a: List[Option[A]]): Option[List[A]] = a.foldRight(Some(Nil): Option[List[A]])(map2(_, _)((a, b) => a :: b))
+
+  def traverse[A, B](a: List[A])(f: A => Option[B]): Option[List[B]] = a.foldRight(Some(Nil): Option[List[B]])((x, y) => map2(f(x), y)(_ :: _))
+
+  def sequenceViaTraverse[A](a: List[Option[A]]): Option[List[A]] = traverse(a)(identity)
+}
+
 sealed trait Option[+A] {
 
   def map[B](f: A => B): Option[B] = this match {
@@ -20,20 +34,6 @@ sealed trait Option[+A] {
 
 case class Some[+A](get: A) extends Option[A]
 case object None extends Option[Nothing]
-
-object Option {
-  def map2[A, B, C](a: Option[A], b: Option[B])(f: (A, B) => C): Option[C] = (a, b) match {
-    case (_, None) => None
-    case (None, _) => None
-    case (Some(a), Some(b)) => Some(f(a, b))
-  }
-
-  def sequence[A](a: List[Option[A]]): Option[List[A]] = a.foldRight(Some(Nil): Option[List[A]])(map2(_, _)((a, b) => a :: b))
-
-  def traverse[A, B](a: List[A])(f: A => Option[B]): Option[List[B]] = a.foldRight(Some(Nil): Option[List[B]])((x, y) => map2(f(x), y)(_ :: _))
-
-  def sequenceViaTraverse[A](a: List[Option[A]]): Option[List[A]] = traverse(a)(identity)
-}
 
 sealed trait Either[+E, +A] {
   def map[B](f: A => B): Either[E, B] = this match {

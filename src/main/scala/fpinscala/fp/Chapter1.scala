@@ -1,4 +1,4 @@
-package com.blogspot.pbrc
+package fpinscala.fp
 
 object Chapter1 {
 
