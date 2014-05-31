@@ -11,7 +11,7 @@ class Chapter7Suite extends FunSuite with BeforeAndAfterAll {
 
   test("map2WithTimeouts respects time outs") {
     def tooLong = {
-      TimeUnit.MILLISECONDS.sleep(70)
+      TimeUnit.MILLISECONDS.sleep(140)
       ()
     }
     def justRight = {

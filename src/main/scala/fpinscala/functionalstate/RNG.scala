@@ -13,7 +13,7 @@ case class Simple(seed: Long) extends RNG {
   }
 }
 
-object Chapter6 {
+object RNG {
 
   def nonNegativeInt(rng: RNG): (Int, RNG) = {
     val (i, r) = rng.nextInt

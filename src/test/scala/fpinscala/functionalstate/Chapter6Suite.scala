@@ -5,7 +5,7 @@ import org.scalatest.Matchers._
 
 class Chapter6Suite extends FunSuite {
 
-  import Chapter6._
+  import RNG._
 
   case class MockMinInt(always: Int) extends RNG {
     def nextInt: (Int, RNG) =
