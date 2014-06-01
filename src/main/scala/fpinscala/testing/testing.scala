@@ -25,7 +25,11 @@ trait Prop {
   def &&(p: Prop): Prop
 }
 
-case class Gen[A](sample: State[RNG, A])
+case class Gen[A](sample: State[RNG, A]) {
+  def flatMap[B](f: A => Gen[B]): Gen[B] = {
+    Gen(sample.flatMap(f.andThen(_.sample)))
+  }
+}
 
 object Gen {
   def choose(start: Int, stopExclusive: Int): Gen[Int] = {
