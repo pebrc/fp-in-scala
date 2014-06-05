@@ -66,4 +66,11 @@ object Gen {
     Gen(State.sequence(List.fill(n)(g.sample)))
   }
 
+  def union[A](g1: Gen[A], g2: Gen[A]): Gen[A] = {
+    for {
+      first <- boolean
+      next <- if (first) g1 else g2
+    } yield next
+  }
+
 }
