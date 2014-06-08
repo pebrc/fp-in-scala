@@ -1,8 +1,9 @@
 package fpinscala.testing
 
-import fpinscala.testing.Prop.{ TestCases, Result, FailedCase, SuccessCount }
-import fpinscala.functionalstate.{ RNG, State }
+import fpinscala.testing.Prop._
+import fpinscala.functionalstate.{ Simple, RNG, State }
 import fpinscala.laziness.Stream
+import scala.Some
 
 /**
  * Exercise 3
@@ -17,6 +18,7 @@ import fpinscala.laziness.Stream
 //}
 
 object Prop {
+  type MaxSize = Int
   type TestCases = Int
   type Result = Option[(FailedCase, SuccessCount)]
   type FailedCase = String
@@ -25,8 +27,23 @@ object Prop {
   def randomStream[A](g: Gen[A])(rng: RNG): Stream[A] =
     Stream.unfold(rng)(rng => Some(g.sample.run(rng)))
 
+  def forAll[A](g: SGen[A])(f: A => Boolean): Prop =
+    forAll(g(_))(f)
+
+  def forAll[A](g: Int => Gen[A])(f: A => Boolean): Prop = Prop {
+    (max, n, rng) =>
+      {
+        val casesPerSize = (n + (max - 1) / max)
+        val props: Stream[Prop] = Stream.from(0).take((n min max) + 1).map(i => forAll(g(i))(f))
+        val prop: Prop = props.map(p => Prop {
+          (max, _, rng) => p.run(max, casesPerSize, rng)
+        }).toList.reduce(_ && _)
+        prop.run(max, n, rng)
+      }
+  }
+
   def forAll[A](as: Gen[A])(f: A => Boolean): Prop = Prop {
-    (n, rng) =>
+    (max, n, rng) =>
       {
         randomStream(as)(rng).zip(Stream.from(0)).take(n).map {
           case (a, i) => try {
@@ -42,29 +59,42 @@ object Prop {
     s"test case $s\n" +
       s"generated an exception: ${e.getMessage}\n" +
       s"stack tracke:\n ${e.getStackTrace.mkString("\n")}"
+
+  def run(p: Prop,
+    maxSize: Int = 100, // A default argument of `200`
+    testCases: Int = 100,
+    rng: RNG = Simple(System.currentTimeMillis)): Unit = {
+    p.run(maxSize, testCases, rng) match {
+      case Some((msg, n)) =>
+        println(s"! Falsified after $n passed tests:\n $msg")
+      case None =>
+        println(s"+ OK, passed $testCases tests.")
+    }
+  }
+
 }
 
-case class Prop(run: (TestCases, RNG) => Result) {
+case class Prop(run: (MaxSize, TestCases, RNG) => Result) {
   def &&(p: Prop): Prop = Prop {
-    (n, rng) =>
-      run(n, rng) match {
-        case None => p.run(n, rng)
+    (max, n, rng) =>
+      run(max, n, rng) match {
+        case None => p.run(max, n, rng)
         case failure => failure
       }
   }
 
   def ||(p: Prop): Prop = Prop {
-    (n, rng) =>
-      run(n, rng) match {
-        case None => p.run(n, rng)
-        case Some((msg, _)) => p.tag(msg).run(n, rng)
+    (max, n, rng) =>
+      run(max, n, rng) match {
+        case None => p.run(max, n, rng)
+        case Some((msg, _)) => p.tag(msg).run(max, n, rng)
       }
   }
 
   def tag(msg: String): Prop = Prop {
-    (n, rng) =>
+    (max, n, rng) =>
       {
-        run(n, rng) match {
+        run(max, n, rng) match {
           case Some((err, cnt)) => Some((msg + "\n" + err, cnt))
           case x => x
         }
@@ -73,7 +103,7 @@ case class Prop(run: (TestCases, RNG) => Result) {
 
 };
 
-case class Gen[A](sample: State[RNG, A]) {
+case class Gen[+A](sample: State[RNG, A]) {
 
   def map[B](f: A => B): Gen[B] = {
     Gen(sample.map(f))
@@ -86,6 +116,13 @@ case class Gen[A](sample: State[RNG, A]) {
   def listOfN(size: Gen[Int]): Gen[List[A]] = {
     size.flatMap(n => Gen.listOfN(n, this))
   }
+
+  //reference solution
+  def unsized: SGen[A] = SGen(_ => this)
+}
+
+case class SGen[+A](forSize: Int => Gen[A]) {
+  def apply(n: Int): Gen[A] = forSize(n)
 }
 
 object Gen {
@@ -114,11 +151,22 @@ object Gen {
     Gen(State.sequence(List.fill(n)(g.sample)))
   }
 
+  def listOf1[A](g: Gen[A]): SGen[List[A]] =
+    SGen(n => listOfN(n max 1, g))
+
+  def listOf[A](g: Gen[A]): SGen[List[A]] = SGen(n => listOfN(n, g))
+
   def union[A](g1: Gen[A], g2: Gen[A]): Gen[A] = {
     for {
       first <- boolean
       next <- if (first) g1 else g2
     } yield next
+  }
+
+  val smallInt = Gen.choose(-10, 10)
+  val maxProp = forAll(listOf1(smallInt)) { l =>
+    val max = l.max
+    !l.exists(_ > max) // No value greater than `max` should exist in `l`
   }
 
 }
