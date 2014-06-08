@@ -27,6 +27,8 @@ sealed trait Stream[+A] {
 
   def exists(p: A => Boolean): Boolean = foldRight(false)((h, t) => p(h) || t)
 
+  def find(p: A => Boolean): Option[A] = foldRight(None: Option[A])((h, t) => if (p(h)) Some(h) else t)
+
   def forAll(p: A => Boolean): Boolean = foldRight(true)((h, t) => p(h) && t)
 
   def takeWhile(p: A => Boolean): Stream[A] =

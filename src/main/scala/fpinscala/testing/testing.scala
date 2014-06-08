@@ -1,7 +1,8 @@
 package fpinscala.testing
 
-import fpinscala.testing.Prop.{ FailedCase, SuccessCount }
+import fpinscala.testing.Prop.{ TestCases, Result, FailedCase, SuccessCount }
 import fpinscala.functionalstate.{ RNG, State }
+import fpinscala.laziness.Stream
 
 /**
  * Exercise 3
@@ -16,14 +17,61 @@ import fpinscala.functionalstate.{ RNG, State }
 //}
 
 object Prop {
+  type TestCases = Int
+  type Result = Option[(FailedCase, SuccessCount)]
   type FailedCase = String
   type SuccessCount = Int
+
+  def randomStream[A](g: Gen[A])(rng: RNG): Stream[A] =
+    Stream.unfold(rng)(rng => Some(g.sample.run(rng)))
+
+  def forAll[A](as: Gen[A])(f: A => Boolean): Prop = Prop {
+    (n, rng) =>
+      {
+        randomStream(as)(rng).zip(Stream.from(0)).take(n).map {
+          case (a, i) => try {
+            if (f(a)) None else Some((a.toString, i))
+          } catch {
+            case e: Exception => Some((buildMsg(a, e), i))
+          }
+        }.find(_.isDefined).getOrElse(None)
+      }
+  }
+
+  private def buildMsg[A](s: A, e: Exception): String =
+    s"test case $s\n" +
+      s"generated an exception: ${e.getMessage}\n" +
+      s"stack tracke:\n ${e.getStackTrace.mkString("\n")}"
 }
 
-trait Prop {
-  def check: Either[(FailedCase, SuccessCount), SuccessCount]
-  def &&(p: Prop): Prop
-}
+case class Prop(run: (TestCases, RNG) => Result) {
+  def &&(p: Prop): Prop = Prop {
+    (n, rng) =>
+      run(n, rng) match {
+        case None => p.run(n, rng)
+        case failure => failure
+      }
+  }
+
+  def ||(p: Prop): Prop = Prop {
+    (n, rng) =>
+      run(n, rng) match {
+        case None => p.run(n, rng)
+        case Some((msg, _)) => p.tag(msg).run(n, rng)
+      }
+  }
+
+  def tag(msg: String): Prop = Prop {
+    (n, rng) =>
+      {
+        run(n, rng) match {
+          case Some((err, cnt)) => Some((msg + "\n" + err, cnt))
+          case x => x
+        }
+      }
+  }
+
+};
 
 case class Gen[A](sample: State[RNG, A]) {
 
