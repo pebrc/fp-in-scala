@@ -169,4 +169,10 @@ object Gen {
     !l.exists(_ > max) // No value greater than `max` should exist in `l`
   }
 
+  //reference solution
+  val sortedProp = forAll(listOf(smallInt)) { l =>
+    val ls = l.sorted
+    l.isEmpty || ls.tail.isEmpty || !l.zip(ls.tail).exists { case (a,b) => a > b }
+  }
+
 }
