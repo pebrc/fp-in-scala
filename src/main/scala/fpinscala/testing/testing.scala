@@ -4,6 +4,10 @@ import fpinscala.testing.Prop._
 import fpinscala.functionalstate.{ Simple, RNG, State }
 import fpinscala.laziness.Stream
 import scala.Some
+import fpinscala.parallelism.Par
+import fpinscala.parallelism.Par.Par
+import fpinscala.parallelism.Par
+import java.util.concurrent.Executors
 
 /**
  * Exercise 3
@@ -60,6 +64,21 @@ object Prop {
       s"generated an exception: ${e.getMessage}\n" +
       s"stack tracke:\n ${e.getStackTrace.mkString("\n")}"
 
+  def check(p: => Boolean): Prop = // Note that we are non-strict here
+    forAll(Gen.unit(()))(_ => p)
+
+  import Gen._
+
+  val S = weighted(
+    choose(1, 4).map(Executors.newFixedThreadPool) -> .75,
+    unit(Executors.newCachedThreadPool) -> .25) // `a -> b` is syntax sugar for `(a,b)`
+
+  def forAllPar[A](g: Gen[A])(f: A => Par[Boolean]): Prop =
+    forAll(S.map2(g)((_, _))) { case (s, a) => f(a)(s).get }
+
+  def checkPar(p: Par[Boolean]): Prop =
+    forAllPar(Gen.unit(()))(_ => p)
+
   def run(p: Prop,
     maxSize: Int = 100, // A default argument of `200`
     testCases: Int = 100,
@@ -70,6 +89,16 @@ object Prop {
       case None =>
         println(s"+ OK, passed $testCases tests.")
     }
+  }
+
+  def equal[A](p: Par[A], p2: Par[A]): Par[Boolean] =
+    Par.map2(p, p2)(_ == _)
+
+  val p2 = checkPar {
+    equal(
+      Par.map(Par.unit(1))(_ + 1),
+      Par.unit(2)
+    )
   }
 
 }
@@ -108,6 +137,9 @@ case class Gen[+A](sample: State[RNG, A]) {
   def map[B](f: A => B): Gen[B] = {
     Gen(sample.map(f))
   }
+
+  def map2[B, C](g: Gen[B])(f: (A, B) => C): Gen[C] =
+    Gen(sample.map2(g.sample)(f))
 
   def flatMap[B](f: A => Gen[B]): Gen[B] = {
     Gen(sample.flatMap(f.andThen(_.sample)))
@@ -163,6 +195,13 @@ object Gen {
     } yield next
   }
 
+  def weighted[A](g1: (Gen[A], Double), g2: (Gen[A], Double)): Gen[A] = {
+    /* The probability we should pull from `g1`. */
+    val g1Threshold = g1._2.abs / (g1._2.abs + g2._2.abs)
+
+    Gen(State(RNG.double).flatMap(d => if (d < g1Threshold) g1._1.sample else g2._1.sample))
+  }
+
   val smallInt = Gen.choose(-10, 10)
   val maxProp = forAll(listOf1(smallInt)) { l =>
     val max = l.max
@@ -172,7 +211,21 @@ object Gen {
   //reference solution
   val sortedProp = forAll(listOf(smallInt)) { l =>
     val ls = l.sorted
-    l.isEmpty || ls.tail.isEmpty || !l.zip(ls.tail).exists { case (a,b) => a > b }
+    l.isEmpty || ls.tail.isEmpty || !l.zip(ls.tail).exists { case (a, b) => a > b }
   }
 
+  //reference solution
+  /* A `Gen[Par[Int]]` generated from a list summation that spawns a new parallel
+ * computation for each element of the input list summed to produce the final
+ * result. This is not the most compelling example, but it provides at least some
+ * variation in structure to use for testing.
+ */
+  val pint2: Gen[Par[Int]] = choose(-100, 100).listOfN(choose(0, 20)).map(l =>
+    l.foldLeft(Par.unit(0))((p, i) =>
+      Par.fork { Par.map2(p, Par.unit(i))(_ + _) }))
+
+  //reference solution
+  val forkProp = forAllPar(pint2)(i => {
+    equal(Par.fork(i), i)
+  })
 }
