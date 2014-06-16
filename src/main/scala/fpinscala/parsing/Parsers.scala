@@ -4,6 +4,9 @@ import scala.language.implicitConversions
 import scala.language.higherKinds
 import fpinscala.testing._
 import fpinscala.testing.Prop._
+
+import scala.util.matching.Regex
+
 /**
  * Created by p_brc on 15/06/2014.
  */
@@ -21,7 +24,7 @@ trait Parsers[ParserError, Parser[+_]] {
   def or[A](s1: Parser[A], s2: => Parser[A]): Parser[A]
 
   def listOfN[A](n: Int, p: Parser[A]): Parser[List[A]] =
-    if(n < 1) succeed(List())
+    if (n < 1) succeed(List())
     else map2(p, listOfN(n - 1, p))(_ :: _)
 
   def many[A](p: Parser[A]): Parser[List[A]] =
@@ -41,17 +44,36 @@ trait Parsers[ParserError, Parser[+_]] {
   def many1[A](p: Parser[A]): Parser[List[A]] =
     map2(p, many(p))(_ :: _)
 
+  def flatMap[A, B](p: Parser[A])(f: A => Parser[B]): Parser[B]
+
+  implicit def regex(r: Regex): Parser[String]
+
+  //reference solution
+  def thatMany(ch: Char): Parser[Int] = {
+    for {
+      digit <- "[0-9]+".r
+      n = digit.toInt
+      _ <- listOfN(n, char(ch))
+    } yield n
+
+  }
+
   case class ParserOps[A](p: Parser[A]) {
 
     def |[B >: A](p2: Parser[B]): Parser[B] = self.or(p, p2)
     def or[B >: A](p2: => Parser[B]): Parser[B] = self.or(p, p2)
+
     def many = self.many(p)
+
     def map[B](f: A => B): Parser[B] = self.map(p)(f)
 
     def **[B](p2: => Parser[B]): Parser[(A, B)] =
       self.product(p, p2)
     def product[B](p2: => Parser[B]): Parser[(A, B)] =
       self.product(p, p2)
+
+    def flatMap[B](f: A => Parser[B]): Parser[B] =
+      self.flatMap(p)(f)
 
   }
 
