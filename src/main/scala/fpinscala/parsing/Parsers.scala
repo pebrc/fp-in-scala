@@ -36,10 +36,17 @@ trait Parsers[ParserError, Parser[+_]] {
 
   def slice[A](p: Parser[A]): Parser[String]
 
-  def product[A, B](p: Parser[A], p2: => Parser[B]): Parser[(A, B)]
+  def product[A, B](p: Parser[A], p2: => Parser[B]): Parser[(A, B)] =
+    flatMap(p)(a => map(p2)(b => (a, b)))
 
   def map2[A, B, C](p: Parser[A], p2: => Parser[B])(f: (A, B) => C): Parser[C] =
-    map(product(p, p2))(f.tupled)
+    flatMap(p)(a => map(p2)(b => f(a, b)))
+  // with for-comprehension
+  //    for {
+  //      a <- p
+  //      b <- p2
+  //    } yield f(a,b)
+  //original implementation: map(product(p, p2))(f.tupled)
 
   def many1[A](p: Parser[A]): Parser[List[A]] =
     map2(p, many(p))(_ :: _)
