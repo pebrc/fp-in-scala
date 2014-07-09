@@ -225,7 +225,7 @@ object Gen {
       Par.fork { Par.map2(p, Par.unit(i))(_ + _) }))
 
   //reference solution
-  val forkProp = forAllPar(pint2)(i => {
-    equal(Par.fork(i), i)
-  })
+  //  val forkProp = forAllPar(pint2)(i => {
+  //    equal(Par.fork(i), i)
+  //  })
 }

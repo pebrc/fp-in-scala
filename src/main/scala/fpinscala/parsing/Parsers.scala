@@ -68,7 +68,7 @@ trait Parsers[ParserError, Parser[+_]] {
 
   case class ParserOps[A](p: Parser[A]) {
 
-    def |[B >: A](p2: Parser[B]): Parser[B] = self.or(p, p2)
+    def |[B >: A](p2: => Parser[B]): Parser[B] = self.or(p, p2)
     def or[B >: A](p2: => Parser[B]): Parser[B] = self.or(p, p2)
 
     def many = self.many(p)
@@ -82,6 +82,8 @@ trait Parsers[ParserError, Parser[+_]] {
 
     def flatMap[B](f: A => Parser[B]): Parser[B] =
       self.flatMap(p)(f)
+
+    def slice: Parser[String] = self.slice(p)
 
   }
 
