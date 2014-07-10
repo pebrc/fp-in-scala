@@ -37,6 +37,11 @@ class MonoidSuite extends FunSuite {
     run(forAll(Gen.listOfN(3, Gen.boolean))(monoidLaws(booleanAnd)))
   }
 
+  test("optionMonoid is monoidal") {
+    val gen = Gen.listOfN(3, Gen.choose(-10, 10).map(i => if (i < 0) None else Some(i)))
+    run(forAll(gen)(monoidLaws(optionMonoid[Int])))
+  }
+
   def run(p: Prop,
     maxSize: Int = 100,
     testCases: Int = 100,
