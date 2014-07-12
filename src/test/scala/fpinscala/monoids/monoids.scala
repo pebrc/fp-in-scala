@@ -42,6 +42,11 @@ class MonoidSuite extends FunSuite {
     run(forAll(gen)(monoidLaws(optionMonoid[Int])))
   }
 
+  //  test("endoMonoid is monoidal") {
+  //    val gen = Gen.listOfN(3, Gen.staticfn[Int, Int](Gen.smallInt))
+  //    run(forAll(gen)(monoidLaws(endoMonoid[Int])))
+  //  }
+
   def run(p: Prop,
     maxSize: Int = 100,
     testCases: Int = 100,

@@ -228,4 +228,16 @@ object Gen {
   //  val forkProp = forAllPar(pint2)(i => {
   //    equal(Par.fork(i), i)
   //  })
+
+  def staticfn[A, B](out: Gen[B]): Gen[A => B] = {
+    out.map(b => (a: A) => b)
+  }
+
+  //    def fn[A, B](in: Cogen[A])(out: Gen[B]): Gen[A => B] = {
+  //      Gen((a: A) => in.sample(a, out.sample))
+  //    }
+}
+
+trait Cogen[-A] {
+  def sample[B](a: A, s: State[RNG, B]): State[RNG, B]
 }
