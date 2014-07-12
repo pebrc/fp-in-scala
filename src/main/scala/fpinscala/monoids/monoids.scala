@@ -82,4 +82,15 @@ object Monoid {
     foldMap(as, endoMonoid[B])(a => b => f(b, a)).apply(z)
   }
 
+  def foldMap[A, B](as: IndexedSeq[A], m: Monoid[B])(f: A => B): B = {
+    as.length match {
+      case 0 => m.zero
+      case 1 => f(as(0))
+      case x => {
+        val (l, r) = as.splitAt(x / 2)
+        m.op(foldMap(l, m)(f), foldMap(r, m)(f))
+      }
+    }
+  }
+
 }
