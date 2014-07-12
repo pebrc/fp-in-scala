@@ -54,4 +54,32 @@ object Monoid {
 
     override def zero: (A) => A = identity
   }
+
+  def concatenate[A](as: List[A], m: Monoid[A]): A =
+    as.foldLeft(m.zero)(m.op)
+
+  def foldMap[A, B](as: List[A], m: Monoid[B])(f: A => B): B = {
+    as.foldLeft(m.zero)((b, a) => m.op(b, f(a)))
+  }
+
+  // from the reference solution
+  def dual[A](m: Monoid[A]): Monoid[A] = new Monoid[A] {
+    def op(x: A, y: A): A = m.op(y, x)
+    val zero = m.zero
+  }
+
+  def foldRight[A, B](as: List[A])(z: B)(f: (A, B) => B) = {
+    //type system does not tell us that this is operating from left to right
+    // in the wrong way ...
+    //unless you reverse the monoid via dual
+    foldMap(as, dual(endoMonoid[B]))(f.curried).apply(z)
+  }
+
+  def foldLeft[A, B](as: List[A])(z: B)(f: (B, A) => B): B = {
+    //also not that the operation of endoMonoid is implicit
+    //no type hints what it does. I used andThen instead of
+    //compose so its order of operation is correct for foldLeft
+    foldMap(as, endoMonoid[B])(a => b => f(b, a)).apply(z)
+  }
+
 }

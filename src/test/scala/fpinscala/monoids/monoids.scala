@@ -47,6 +47,16 @@ class MonoidSuite extends FunSuite {
   //    run(forAll(gen)(monoidLaws(endoMonoid[Int])))
   //  }
 
+  test("foldLeft operates from left to right") {
+    val input = List('a, 'b, 'c)
+    assert("*'a'b'c" === foldLeft(input)("*")((a, b) => a + b.toString))
+  }
+
+  test("foldRight operates from right to left") {
+    val input = List('a, 'b, 'c)
+    assert("'a'b'c*" === foldRight(input)("*")((a, b) => a + b.toString))
+  }
+
   def run(p: Prop,
     maxSize: Int = 100,
     testCases: Int = 100,

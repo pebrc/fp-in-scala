@@ -233,9 +233,10 @@ object Gen {
     out.map(b => (a: A) => b)
   }
 
-  //    def fn[A, B](in: Cogen[A])(out: Gen[B]): Gen[A => B] = {
-  //      Gen((a: A) => in.sample(a, out.sample))
-  //    }
+  //  def fn[A, B](in: Cogen[A])(out: Gen[B]): Gen[A => B] = {
+  //    val cogen = in.sample(_, out.sample)
+  //    Gen(out.flatMap(b => (a: A) => cogen(a)))
+  //  }
 }
 
 trait Cogen[-A] {
