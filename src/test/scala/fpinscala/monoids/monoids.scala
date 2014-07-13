@@ -14,6 +14,7 @@ class MonoidSuite extends FunSuite {
 
   def monoidLaws[A](m: Monoid[A])(l: List[A]): Boolean = l match {
     case a1 :: a2 :: a3 :: Nil => {
+      println(a1, a2, a3)
       (m.op(m.op(a1, a2), a3) == m.op(a1, m.op(a2, a3))) &&
         (m.op(a1, m.zero) == m.op(m.zero, a1))
     }
@@ -55,6 +56,15 @@ class MonoidSuite extends FunSuite {
   test("foldRight operates from right to left") {
     val input = List('a, 'b, 'c)
     assert("'a'b'c*" === foldRight(input)("*")((a, b) => a + b.toString))
+  }
+
+  test("wc is monoidal") {
+    val gen = Gen.listOfN(3, Gen.choose(0, 128).map(_.toChar).map(c => WC(String.valueOf(c))))
+    run(forAll(gen)(monoidLaws(wcMonoid)))
+  }
+
+  test("WC behaves as specified") {
+    assert(3 === WC.count("dolor sit amet"))
   }
 
   def run(p: Prop,

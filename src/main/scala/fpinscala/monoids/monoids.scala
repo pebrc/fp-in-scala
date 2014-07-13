@@ -108,4 +108,42 @@ object Monoid {
     Par.flatMap(Par.parMap(v)(f))(bs => foldMap(bs, par(m))(Par.lazyUnit(_)))
   }
 
+  object WC {
+    def apply(s: String): WC = {
+      def stub(c: Char): WC =
+        if (c.isWhitespace)
+          Part("", 0, "")
+        else
+          Stub(c.toString)
+      foldMap(s.toIndexedSeq, wcMonoid)(stub)
+    }
+
+    def count(s: String): Int = {
+      def unstub(s: String) = s.length min 1
+      WC(s) match {
+        case Stub(s) => unstub(s)
+        case Part(l, c, r) => unstub(l) + c + unstub(r)
+      }
+    }
+
+  }
+
+  sealed trait WC
+  case class Stub(chars: String) extends WC
+  case class Part(lStub: String, words: Int, rStub: String) extends WC
+
+  val wcMonoid: Monoid[WC] = new Monoid[WC] {
+    override def op(a1: WC, a2: WC): WC = {
+      def numWords(x: String, y: String) = if ((x + y).isEmpty()) 0 else 1
+      (a1, a2) match {
+        case (Part(l1, c1, r1), Part(l2, c2, r2)) => Part(l1, c1 + c2 + numWords(r1, l1), r2)
+        case (Stub(x), Stub(y)) => Stub(x + y)
+        case (Part(l, c, r), Stub(s)) => Part(l, c, r + s)
+        case (Stub(s), Part(l, c, r)) => Part(s + l, c, r)
+      }
+    }
+
+    override def zero: WC = Stub("")
+  }
+
 }
