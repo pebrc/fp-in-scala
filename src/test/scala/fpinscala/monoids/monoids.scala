@@ -14,7 +14,6 @@ class MonoidSuite extends FunSuite {
 
   def monoidLaws[A](m: Monoid[A])(l: List[A]): Boolean = l match {
     case a1 :: a2 :: a3 :: Nil => {
-      println(a1, a2, a3)
       (m.op(m.op(a1, a2), a3) == m.op(a1, m.op(a2, a3))) &&
         (m.op(a1, m.zero) == m.op(m.zero, a1))
     }
