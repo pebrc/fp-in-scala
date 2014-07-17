@@ -66,6 +66,14 @@ class MonoidSuite extends FunSuite {
     assert(3 === WC.count("dolor sit amet"))
   }
 
+  test("productMonoid is monoidal") {
+    val pairs = for {
+      i <- Gen.smallInt
+      b <- Gen.boolean
+    } yield (i, b)
+    run(forAll(Gen.listOfN(3, pairs))(monoidLaws(productMonoid(intAddition, booleanAnd))))
+  }
+
   def run(p: Prop,
     maxSize: Int = 100,
     testCases: Int = 100,
