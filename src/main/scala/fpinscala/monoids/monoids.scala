@@ -205,4 +205,12 @@ object Monoid {
     }
   }
 
+  object OptionFoldable extends Foldable[Option] {
+    override def foldRight[A, B](as: Option[A])(z: B)(f: (A, B) => B): B =
+      as.foldRight(z)(f)
+
+    override def foldLeft[A, B](as: Option[A])(z: B)(f: (B, A) => B): B =
+      as.foldLeft(z)(f)
+  }
+
 }
