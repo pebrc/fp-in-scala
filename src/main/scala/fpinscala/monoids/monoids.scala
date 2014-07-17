@@ -65,6 +65,12 @@ object Monoid {
     override def zero: (A, B) = (A.zero, B.zero)
   }
 
+  def functionMonoid[A, B](B: Monoid[B]): Monoid[A => B] = new Monoid[(A) => B] {
+    override def op(a1: (A) => B, a2: (A) => B): (A) => B = a => B.op(a1(a), a2(a))
+
+    override def zero: (A) => B = _ => B.zero
+  }
+
   def concatenate[A](as: List[A], m: Monoid[A]): A =
     as.foldLeft(m.zero)(m.op)
 
