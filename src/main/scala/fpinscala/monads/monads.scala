@@ -44,6 +44,11 @@ trait Monad[F[_]] extends Functor[F] {
     a => flatMap(f(a))(g)
   }
 
+  //reference solution
+  def flatMapViaCompose[A, B](ma: F[A])(f: A => F[B]): F[B] = {
+    compose((_: Unit) => ma, f)(())
+  }
+
 }
 
 object Monad {
