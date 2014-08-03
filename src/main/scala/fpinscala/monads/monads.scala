@@ -49,6 +49,10 @@ trait Monad[F[_]] extends Functor[F] {
     compose((_: Unit) => ma, f)(())
   }
 
+  def join[A](mma: F[F[A]]): F[A] = {
+    flatMap(mma)(ma => ma)
+  }
+
 }
 
 object Monad {
