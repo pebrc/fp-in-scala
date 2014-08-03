@@ -59,6 +59,21 @@ trait Monad[F[_]] extends Functor[F] {
 
 }
 
+case class Id[A](value: A) {
+  def flatMap[B](f: (A) => Id[B]): Id[B] = {
+    f(value)
+  }
+
+  def map[B](f: (A) => B): Id[B] = {
+    Id(f(value))
+  }
+}
+
+case class Reader[R, A](run: R => A)
+object Reader {
+  def ask[R]: Reader[R, R] = Reader(r => r)
+}
+
 object Monad {
   val genMonad = new Monad[Gen] {
     def unit[A](a: => A): Gen[A] = Gen.unit(a)
@@ -92,16 +107,6 @@ object Monad {
 
     override def flatMap[A, B](ma: Stream[A])(f: (A) => Stream[B]): Stream[B] =
       ma.flatMap(f)
-  }
-
-  case class Id[A](value: A) {
-    def flatMap[B](f: (A) => Id[B]): Id[B] = {
-      f(value)
-    }
-
-    def map[B](f: (A) => B): Id[B] = {
-      Id(f(value))
-    }
   }
 
   def idMonad = new Monad[Id] {
