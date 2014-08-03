@@ -116,4 +116,11 @@ object Monad {
       ma.flatMap(f)
   }
 
+  def readerMonad[R] = new Monad[({ type aReader[A] = Reader[R, A] })#aReader] {
+    override def unit[A](a: => A): Reader[R, A] = Reader(r => a)
+
+    override def flatMap[A, B](ma: Reader[R, A])(f: (A) => Reader[R, B]): Reader[R, B] =
+      Reader(r => f(ma.run(r)).run(r))
+  }
+
 }
