@@ -44,11 +44,19 @@ trait Applicative[F[_]] extends Functor[F] {
 
   def product[G[_]](G: Applicative[G]): Applicative[({ type f[x] = (F[x], G[x]) })#f] = new Applicative[({ type f[x] = (F[x], G[x]) })#f] {
 
-    // primitive combinators
     override def map2[A, B, C](fa: (F[A], G[A]), fb: (F[B], G[B]))(f: (A, B) => C): (F[C], G[C]) =
       (self.map2(fa._1, fb._1)(f), G.map2(fa._2, fb._2)(f))
 
     override def unit[A](a: => A): (F[A], G[A]) = (self.unit(a), G.unit(a))
+
+  }
+
+  def compose[G[_]](G: Applicative[G]): Applicative[({ type f[x] = F[G[x]] })#f] = new Applicative[({ type f[x] = F[G[x]] })#f] {
+
+    override def map2[A, B, C](fa: F[G[A]], fb: F[G[B]])(f: (A, B) => C): F[G[C]] =
+      self.map2(fa, fb)((a: G[A], b: G[B]) => G.map2(a, b)(f))
+
+    override def unit[A](a: => A): F[G[A]] = self.unit(G.unit(a))
 
   }
 
