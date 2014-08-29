@@ -4,6 +4,8 @@ import scala.language.higherKinds
 
 trait Applicative[F[_]] extends Functor[F] {
 
+  self =>
+
   // primitive combinators
   def map2[A, B, C](fa: F[A], fb: F[B])(f: (A, B) => C): F[C]
   def unit[A](a: => A): F[A]
@@ -38,6 +40,16 @@ trait Applicative[F[_]] extends Functor[F] {
     fc: F[C],
     fd: F[D])(f: (A, B, C, D) => E): F[E] = {
     apply(apply(apply(apply(unit(f.curried))(fa))(fb))(fc))(fd)
+  }
+
+  def product[G[_]](G: Applicative[G]): Applicative[({ type f[x] = (F[x], G[x]) })#f] = new Applicative[({ type f[x] = (F[x], G[x]) })#f] {
+
+    // primitive combinators
+    override def map2[A, B, C](fa: (F[A], G[A]), fb: (F[B], G[B]))(f: (A, B) => C): (F[C], G[C]) =
+      (self.map2(fa._1, fb._1)(f), G.map2(fa._2, fb._2)(f))
+
+    override def unit[A](a: => A): (F[A], G[A]) = (self.unit(a), G.unit(a))
+
   }
 
 }
@@ -76,7 +88,7 @@ case class Success[A](a: A) extends Validation[Nothing, A]
 
 object Applicative {
 
-  def validationApplicative[E] = new Applicative[({ type f[x] = Validation[E, x] })#f] {
+  def validation[E] = new Applicative[({ type f[x] = Validation[E, x] })#f] {
 
     override def map2[A, B, C](fa: Validation[E, A], fb: Validation[E, B])(f: (A, B) => C): Validation[E, C] =
       (fa, fb) match {
@@ -90,7 +102,7 @@ object Applicative {
 
   }
 
-  val stringWebForm = validationApplicative[String]
+  val stringWebForm = validation[String]
 
   case class WebForm(name: String, birthdate: Date, phoneNumber: String)
 
