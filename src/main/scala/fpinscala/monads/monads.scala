@@ -123,4 +123,12 @@ object Monad {
       Reader(r => f(ma.run(r)).run(r))
   }
 
+  def eitherMonad[E] = new Monad[({ type f[x] = Either[E, x] })#f] {
+    override def unit[A](a: => A): Either[E, A] = Right(a)
+
+    override def flatMap[A, B](ma: Either[E, A])(f: (A) => Either[E, B]): Either[E, B] =
+      ma.fold(Left(_), f)
+
+  }
+
 }
