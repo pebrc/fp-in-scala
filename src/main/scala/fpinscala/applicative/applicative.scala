@@ -142,3 +142,34 @@ object Applicative {
         WebForm(_, _, _))
 
 }
+
+trait Traverse[F[_]] {
+  def traverse[G[_]: Applicative, A, B](fa: F[A])(f: A => G[B]): G[F[B]] =
+    sequence(map(fa)(f))
+  def sequence[G[_]: Applicative, A](fga: F[G[A]]): G[F[A]] =
+    traverse(fga)(ga => ga)
+
+  def map[A, B](fa: F[A])(f: A => B): F[B]
+}
+
+object Traverse {
+
+  def traverseList[A] = new Traverse[List[A]] {
+    override def map[A, B](fa: List[A])(f: A => B): List[B] = fa.map(f)
+  }
+
+  def traverseOption[A] = new Traverse[Option[A]] {
+    override def map[A, B](fa: Option[A])(f: (A) => B): Option[B] = fa.map(f)
+  }
+
+  def traverseTree[A] = new Traverse[Tree[A]] {
+    override def map[A, B](fa: Tree[A])(f: (A) => B): Tree[B] = fa.map(f)
+  }
+
+}
+
+case class Tree[+A](head: A, tail: List[Tree[A]]) {
+  def map[B](f: A => B): Tree[B] = {
+    Tree(f(head), tail.map(_.map(f)))
+  }
+}
